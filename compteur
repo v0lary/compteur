@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compteur de Victoires Objectif</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS (Style) */
+        body { 
+            font-family: 'Luckiest Guy', cursive; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 0; 
+            background-color: transparent !important; /* FOND TRANSPARENT POUR LIVE STUDIO */
+            color: white; 
+            user-select: none;
+        }
+        
+        .container {
+            background-color: transparent;
+            padding: 10px 5px; 
+            text-align: center;
+            max-width: 350px; /* Limite la largeur du contenu */
+        }
+
+        h2 { 
+            font-family: 'Luckiest Guy', cursive;
+            color: #f1c40f; 
+            margin-top: 30px; 
+            margin-bottom: 10px;
+            font-size: 1.5em; 
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); 
+            white-space: nowrap;
+        }
+        
+        #win-display { 
+            font-size: 80px; 
+            font-weight: bold; 
+            margin-bottom: 20px; 
+            padding: 10px 20px;
+            border: 5px solid; 
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.7); 
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        button { 
+            font-family: Arial, sans-serif; 
+            padding: 12px 20px;
+            font-size: 16px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 5px; 
+            color: white; 
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        #manual-controls {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(52, 73, 94, 0.9);
+            border-radius: 8px;
+            width: auto;
+            max-width: 300px;
+            color: #ecf0f1;
+        }
+        
+        #manual-controls p {
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+
+        .controls { 
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"] {
+            font-family: Arial, sans-serif;
+            padding: 8px;
+            font-size: 16px;
+            width: 70px;
+            margin: 5px 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .add-btn { background-color: #27ae60; }
+        .remove-btn { background-color: #c0392b; }
+        .set-btn { background-color: #3498db; }
+        .reset-btn { background-color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div id="win-display">0/10</div>
+        
+        <div id="manual-controls">
+            <h2>⚙️ CONTRÔLES AVANCÉS</h2>
+            <p>
+                **Définir l'Objectif :** <br>
+                <input type="number" id="target-input" value="10" min="1">
+                <button onclick="setTarget()" class="set-btn">Définir</button>
+            </p>
+            <p>
+                **Compte Actuel (Manuel) :** <br>
+                <input type="number" id="manual-count-input" value="0">
+                <button onclick="setManualCount()" class="set-btn">Appliquer</button>
+            </p>
+        </div>
+
+        <h2>AJOUT RAPIDE</h2>
+        <div class="controls">
+            <button class="add-btn" onclick="updateCounter(1)">+1</button>
+            <button class="add-btn" onclick="updateCounter(5)">+5</button>
+            <button class="add-btn" onclick="updateCounter(50)">+50</button>
+        </div>
+
+        <h2>ENLÈVEMENT RAPIDE</h2>
+        <div class="controls">
+            <button class="remove-btn" onclick="updateCounter(-1)">-1</button>
+            <button class="remove-btn" onclick="updateCounter(-5)">-5</button>
+            <button class="remove-btn" onclick="updateCounter(-50)">-50</button>
+        </div>
+
+        <h2>RÉINITIALISER LE COMPTEUR</h2>
+        <div class="controls">
+            <button class="reset-btn" onclick="resetCounter()">RESET (0)</button>
+        </div>
+    </div>
+
+    <script>
+        // JAVASCRIPT
+        let currentWins = 0;
+        let targetWins = 10;
+        
+        const display = document.getElementById('win-display');
+        const targetInput = document.getElementById('target-input');
+        const manualCountInput = document.getElementById('manual-count-input');
+
+        const COLOR_DEFAULT = '#3498db'; /* Bleu */
+        const COLOR_SUCCESS = '#2ecc71'; /* Vert */
+        const COLOR_NEGATIVE = '#e74c3c'; /* Rouge */
+
+        function renderDisplay() {
+            let displayColor = COLOR_DEFAULT;
+            
+            if (currentWins >= targetWins) {
+                displayColor = COLOR_SUCCESS;
+            } else if (currentWins < 0) {
+                displayColor = COLOR_NEGATIVE;
+            }
+
+            // Mise à jour de l'affichage avec la nouvelle couleur
+            display.innerHTML = `<span style="color: ${displayColor};">${currentWins}/${targetWins}</span>`;
+            display.style.borderColor = displayColor;
+        }
+
+        function updateCounter(change) {
+            currentWins += change;
+            manualCountInput.value = currentWins;
+            renderDisplay();
+        }
+
+        function resetCounter() {
+            currentWins = 0;
+            manualCountInput.value = 0;
+            renderDisplay();
+        }
+
+        function setTarget() {
+            const newTarget = parseInt(targetInput.value);
+            if (!isNaN(newTarget) && newTarget > 0) {
+                targetWins = newTarget;
+                renderDisplay();
+            } else {
+                targetInput.value = targetWins;
+            }
+        }
+        
+        function setManualCount() {
+            const newCount = parseInt(manualCountInput.value);
+            if (!isNaN(newCount)) {
+                currentWins = newCount;
+                renderDisplay();
+            } else {
+                manualCountInput.value = currentWins;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDisplay);
+    </script>
+</body>
+</html>
+
